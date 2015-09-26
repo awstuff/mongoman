@@ -12,7 +12,6 @@
     "cors": "^2.7.1",
     "express": "^4.13.3",
     "mongodb": "^2.0.43",
-    "underscore": "^1.8.3"
   },
   "devDependencies": {
     "gulp": "^3.9.0",
