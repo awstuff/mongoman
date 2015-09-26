@@ -10,6 +10,16 @@ app.use(bodyParser.json());
 var path = require("path");
 var paths = require("./app/paths");
 var confdata = require("./" + paths.CONF_DATA);
+var auth = require("basic-auth");
+app.use(function (req, res, next) {
+	var credentials = auth(req);
+	if (!credentials || credentials.name !== confdata.basicAuth.USERNAME || credentials.pass !== confdata.basicAuth.PASSWORD) {
+		res.setHeader("WWW-Authenticate", "Basic realm='MongoManager'");
+		res.sendStatus(401);
+	} else {
+		next();
+	}
+});
 var mongodb = require("mongodb");
 mongodb.MongoClient.connect(confdata.DB_URL, function (err, db) {
 	if (err) {
