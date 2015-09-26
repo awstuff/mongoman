@@ -1,0 +1,91 @@
+<!doctype html>
+
+<html lang="en" ng-app="root" ng-controller="mainController">
+<head>
+	<meta charset="utf-8">
+	<meta name="author" content="Adrian Wirth">
+	<title>{{dbName}} - Mongo Manager</title>
+	<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="css/custom.css">
+	<script type="text/javascript" src="js/angular.min.js"></script>
+	<script type="text/javascript" src="js/ui-bootstrap-tpls-0.13.3.min.js"></script>
+	<script type="text/javascript" src="js/controller.js"></script>
+	<script type="text/javascript" src="js/FileSaver.min.js"></script>
+	<script type="text/javascript" src="js/Blob.js"></script>
+</head>
+<body>
+	<div class="container">
+		<div class="row">
+			<div class="col-md-9 col-md-offset-3 top-shiz">
+				<h1 class="text-primary">
+					Mongo Manager
+					<small>{{dbName}}</small>
+				</h1>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-3">
+				<div class="panel panel-default">
+					<div class="panel-heading">Collections</div>
+					<div class="panel-body side">
+						<div class="text-muted" ng-show="collections == null">
+							No collections found.
+						</div>
+						<ul ng-show="collections != null">
+							<li ng-repeat="coll in collections" ng-click="setCollection(coll)">{{coll}}</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-9">
+				<div class="row">
+					<div class="col-md-12">
+						<div class="text-muted" ng-show="collection == null">
+							Please select a collection first.
+						</div>
+						<div ng-show="collection != null">
+							<h4 class="text-center">
+								<em>{{collection}}</em>
+							</h4>
+							<hr>
+							<div class="new-document">
+								<div class="form-group">
+									<textarea class="form-control" placeholder="Add new document" ng-modeL="newDoc"></textarea>
+								</div>
+								<div class="form-group">
+									<button type="button" class="btn btn-success" ng-disabled="newDoc == ''" ng-click="addDoc()">Add</button>
+									<button type="button" class="btn btn-danger" ng-disabled="documents == null" ng-click="removeAll()">Delete all documents</button>
+									<button type="button" class="btn btn-info pull-right" ng-disabled="documents == null" ng-click="export()">Export collection</button>
+								</div>
+							</div>
+							<hr>
+							<div class="text-muted" ng-show="documents == null">
+								No documents found.
+							</div>
+							<div class="collections">
+								<div class="pagination-container">
+									<pagination ng-model="pagination.currentPage" total-items="documents.length" items-per-page="pagination.itemsPerPage" max-size="5" boundary-links="true"></pagination>
+								</div>
+								<div class="panel panel-default" ng-repeat="doc in paginatedDocuments">
+									<div class="panel-heading">
+										<button type="button" class="btn btn-danger btn-xs pull-right" ng-click="remove($index)">Delete document</button>
+									</div>
+									<div class="panel-body">
+										<table>
+											<tr ng-repeat="(key, value) in doc">
+												<td class="key text-muted">{{key}}: </td>
+												<td class="value">{{value}}</td>
+											</tr>
+										</table>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+
+</html>

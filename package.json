@@ -1,0 +1,20 @@
+{
+  "name": "mongoman",
+  "version": "1.0.0",
+  "description": "a gui providing restricted access to a mongodb database",
+  "main": "server.js",
+  "author": "Adrian Wirth <adrian.wirth@yahoo.de>",
+  "license": "MIT",
+  "dependencies": {
+    "body-parser": "^1.13.3",
+    "compression": "^1.5.2",
+    "cors": "^2.7.1",
+    "express": "^4.13.3",
+    "mongodb": "^2.0.43",
+    "underscore": "^1.8.3"
+  },
+  "devDependencies": {
+    "gulp": "^3.9.0",
+    "gulp-nodemon": "^2.0.4"
+  }
+}
