@@ -66,3 +66,14 @@ textarea.form-control {
     overflow: auto;
     width: 100%;
 }
+.form-control.auto-width {
+    display: inline-block;
+    vertical-align: middle;
+    width: auto;
+}
+.px-to-right {
+    margin-right: 4px;
+}
+.px-to-bottom {
+    margin-bottom: 100px;
+}

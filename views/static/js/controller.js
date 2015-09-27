@@ -10,9 +10,11 @@ root.controller("mainController", function ($scope, apiName, $http) {
     $scope.collection = null;
     $scope.documents = null;
     $scope.newDoc = "";
+    $scope.filter = "";
     $scope.pagination = {
 		currentPage : 1,
-		itemsPerPage : 10
+		itemsPerPage : 10,
+        options : [5, 10, 20, 50, 100]
 	};
 
     $http.get($scope.api + "dbname").then(function (res) {
@@ -23,6 +25,12 @@ root.controller("mainController", function ($scope, apiName, $http) {
         $scope.collections = res.data;
     });
 
+    $scope.repaginate = function () {
+        var start = ($scope.pagination.currentPage - 1) * $scope.pagination.itemsPerPage;
+        var end = start + $scope.pagination.itemsPerPage;
+        $scope.paginatedDocuments = $scope.documents.slice(start, end);
+    };
+
     $scope.setCollection = function (c) {
         $scope.collection = c;
         $http.get($scope.api + "documents/" + $scope.collection).then(function (res) {
@@ -31,29 +39,45 @@ root.controller("mainController", function ($scope, apiName, $http) {
                 $scope.paginatedDocuments = [];
             } else {
                 $scope.documents = res.data;
-                $scope.$watch("pagination.currentPage", function (val) {
-    				var start = ($scope.pagination.currentPage - 1) * $scope.pagination.itemsPerPage;
-    				var end = start + $scope.pagination.itemsPerPage;
-    				$scope.paginatedDocuments = $scope.documents.slice(start, end);
+                $scope.$watch("pagination.currentPage + '#' + pagination.itemsPerPage", function () {
+    				$scope.repaginate();
     			});
             }
         });
     };
 
-    $scope.addDoc = function () {
-        $http.post($scope.api + "newdocument", {
-            collection : $scope.collection,
-            document : $scope.newDoc
-        }).then(function (res) {
+    $scope.postAndRefreshDocs = function (apiFunctionName, data, successMessage, callback) {
+        $http.post($scope.api + apiFunctionName, data).then(function (res) {
             if (res.data.success && res.data.success === true) {
                 $scope.setCollection($scope.collection);
-                $scope.newDoc = "";
-                alert("Document(s) added successfully.");
+                if (callback) {
+                    callback();
+                }
+                if (successMessage) {
+                    alert(successMessage);
+                }
             } else {
                 alert("An error occured.");
             }
         }, function () {
             alert("An error occured.");
+        });
+    };
+
+    $scope.exportObject = function (obj, fileName) {
+        saveAs(new Blob([
+            angular.toJson(obj)
+        ], {
+            type : "application/json;charset=utf-8"
+        }), fileName + ".json");
+    };
+
+    $scope.addDoc = function () {
+        $scope.postAndRefreshDocs("newdocument", {
+            collection : $scope.collection,
+            document : $scope.newDoc
+        }, "Document(s) added successfully.", function () {
+            $scope.newDoc = "";
         });
     };
 
@@ -61,41 +85,48 @@ root.controller("mainController", function ($scope, apiName, $http) {
         if (!confirm("Are you sure? This will remove all documents from the selected collection!")) {
             return;
         }
-        $http.post($scope.api + "clear", {
+        $scope.postAndRefreshDocs("clear", {
             collection : $scope.collection
-        }).then(function (res) {
-            if (res.data.success && res.data.success === true) {
-                $scope.setCollection($scope.collection);
-                alert("Document(s) deleted successfully.");
-            } else {
-                alert("An error occured.");
-            }
-        }, function () {
-            alert("An error occured.");
-        });
+        }, "Document(s) deleted successfully.");
     };
 
     $scope.remove = function (index) {
-        $http.post($scope.api + "remove", {
+        if (!confirm("Are you sure you want to remove the selected document?")) {
+            return;
+        }
+        $scope.postAndRefreshDocs("clear", {
             collection : $scope.collection,
             document : angular.toJson($scope.paginatedDocuments[index])
+        }, "Document deleted successfully.");
+    };
+
+    $scope.export = function () {
+        $scope.exportObject($scope.documents, $scope.collection);
+    };
+
+    $scope.exportDoc = function (index) {
+        $scope.exportObject($scope.paginatedDocuments[index], $scope.collection + "_doc");
+    };
+
+    $scope.applyFilter = function () {
+        $http.post($scope.api + "filter", {
+            collection : $scope.collection,
+            filter : $scope.filter
         }).then(function (res) {
-            if (res.data.success && res.data.success === true) {
-                $scope.setCollection($scope.collection);
-                alert("Document deleted successfully.");
+            if (res.data === void 0 || res.data === null || res.data.length === 0) {
+                $scope.documents = null;
+                $scope.paginatedDocuments = [];
             } else {
-                alert("An error occured.");
+                $scope.documents = res.data;
+                $scope.repaginate();
             }
         }, function () {
             alert("An error occured.");
         });
     };
 
-    $scope.export = function () {
-        saveAs(new Blob([
-            angular.toJson($scope.documents)
-        ], {
-            type : "application/json;charset=utf-8"
-        }), $scope.collection + ".json");
+    $scope.resetFilter = function () {
+        $scope.setCollection($scope.collection);
+        $scope.filter = "";
     };
 });

@@ -82,4 +82,21 @@ module.exports = function (router, db) {
             }
         });
     });
+    router.post("/filter", function (req, res) {
+        var collection = req.body.collection;
+        var filter = req.body.filter;
+        try {
+            filter = JSON.parse(filter);
+        } catch (e) {
+            res.sendStatus(400);
+            return;
+        }
+        db.collection(collection).find(filter).toArray(function (err, docs) {
+    		if (err) {
+                res.sendStatus(500);
+                return;
+    		}
+    		res.json(docs);
+    	});
+    });
 };

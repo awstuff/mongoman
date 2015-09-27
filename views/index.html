@@ -14,6 +14,7 @@
 	<script type="text/javascript" src="js/Blob.js"></script>
 </head>
 <body>
+	<a name="top"></a>
 	<div class="container">
 		<div class="row">
 			<div class="col-md-9 col-md-offset-3 top-shiz">
@@ -48,27 +49,39 @@
 								<em>{{collection}}</em>
 							</h4>
 							<hr>
-							<div class="new-document">
-								<div class="form-group">
-									<textarea class="form-control" placeholder="Add new document" ng-modeL="newDoc"></textarea>
-								</div>
-								<div class="form-group">
-									<button type="button" class="btn btn-success" ng-disabled="newDoc == ''" ng-click="addDoc()">Add</button>
-									<button type="button" class="btn btn-danger" ng-disabled="documents == null" ng-click="removeAll()">Delete all documents</button>
-									<button type="button" class="btn btn-info pull-right" ng-disabled="documents == null" ng-click="export()">Export collection</button>
-								</div>
+							<div class="form-group">
+								<textarea class="form-control" placeholder="New document (JSON)" ng-modeL="newDoc"></textarea>
+							</div>
+							<div class="form-group">
+								<button type="button" class="btn btn-success" ng-disabled="newDoc == ''" ng-click="addDoc()">Add new document</button>
+								<button type="button" class="btn btn-danger" ng-disabled="documents == null" ng-click="removeAll()">Delete all documents</button>
+								<button type="button" class="btn btn-info pull-right" ng-disabled="documents == null" ng-click="export()">Export collection</button>
+							</div>
+							<div class="form-group">
+								<textarea class="form-control" ng-model="filter" placeholder="Filter (JSON)"></textarea>
+							</div>
+							<div class="form-group">
+								<button type="button" class="btn btn-default" ng-disabled="filter == ''" ng-click="applyFilter()">Apply filter</button>
+								<button type="button" class="btn btn-default" ng-click="resetFilter()">Reset</button>
 							</div>
 							<hr>
 							<div class="text-muted" ng-show="documents == null">
 								No documents found.
 							</div>
-							<div class="collections">
-								<div class="pagination-container">
-									<pagination ng-model="pagination.currentPage" total-items="documents.length" items-per-page="pagination.itemsPerPage" max-size="5" boundary-links="true"></pagination>
+							<div class="collections" ng-show="documents != null">
+								<div class="form-group">
+									Documents per page:
+									<select class="form-control auto-width" ng-model="pagination.itemsPerPage" ng-options="op for op in pagination.options track by op"></select>
+									({{documents.length}} total)
 								</div>
+								<div class="pagination-container">
+									<pagination ng-model="pagination.currentPage" total-items="documents.length" items-per-page="pagination.itemsPerPage" max-size="7" boundary-links="true"></pagination>
+								</div>
+								<hr>
 								<div class="panel panel-default" ng-repeat="doc in paginatedDocuments">
 									<div class="panel-heading">
 										<button type="button" class="btn btn-danger btn-xs pull-right" ng-click="remove($index)">Delete document</button>
+										<button type="button" class="btn btn-info btn-xs pull-right px-to-right" ng-click="exportDoc($index)">Export document</button>
 									</div>
 									<div class="panel-body">
 										<table>
@@ -78,6 +91,11 @@
 											</tr>
 										</table>
 									</div>
+								</div>
+								<div class="text-center px-to-bottom">
+									<a href="#top">
+										<button type="button" class="btn btn-default">Back to the top</button>
+									</a>
 								</div>
 							</div>
 						</div>
