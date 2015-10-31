@@ -1,9 +1,16 @@
-var root = angular.module("root", ["ui.bootstrap"]);
+var root = angular.module("root", ["ngMaterial", "angularUtils.directives.dirPagination"]);
 
 // set api name here
 root.value("apiName", "mongoman");  // set in app/confdata.js as well!
 
-root.controller("mainController", function ($scope, apiName, $http) {
+root.config(function ($mdThemingProvider) {
+    $mdThemingProvider.theme("default")
+        // .dark()
+        .primaryPalette("brown")
+        .accentPalette("teal");
+});
+
+root.controller("mainController", function ($scope, $mdSidenav, apiName, $http) {
     $scope.api = "/" + apiName + "/";
     $scope.dbName = "";
     $scope.collections = null;
@@ -17,6 +24,10 @@ root.controller("mainController", function ($scope, apiName, $http) {
         options : [5, 10, 20, 50, 100]
 	};
 
+    $scope.toggleSidenav = function (menuId) {
+        $mdSidenav(menuId).toggle();
+    };
+
     $http.get($scope.api + "dbname").then(function (res) {
         $scope.dbName = res.data;
     });
@@ -25,23 +36,13 @@ root.controller("mainController", function ($scope, apiName, $http) {
         $scope.collections = res.data;
     });
 
-    $scope.repaginate = function () {
-        var start = ($scope.pagination.currentPage - 1) * $scope.pagination.itemsPerPage;
-        var end = start + $scope.pagination.itemsPerPage;
-        $scope.paginatedDocuments = $scope.documents.slice(start, end);
-    };
-
     $scope.setCollection = function (c) {
         $scope.collection = c;
         $http.get($scope.api + "documents/" + $scope.collection).then(function (res) {
             if (res.data === void 0 || res.data === null || res.data.length === 0) {
                 $scope.documents = null;
-                $scope.paginatedDocuments = [];
             } else {
                 $scope.documents = res.data;
-                $scope.$watch("pagination.currentPage + '#' + pagination.itemsPerPage", function () {
-    				$scope.repaginate();
-    			});
             }
         });
     };
@@ -90,13 +91,17 @@ root.controller("mainController", function ($scope, apiName, $http) {
         }, "Document(s) deleted successfully.");
     };
 
+    $scope.calcGlobalIndex = function (index) {
+        return ($scope.pagination.currentPage - 1) * $scope.pagination.itemsPerPage + index;
+    };
+
     $scope.remove = function (index) {
         if (!confirm("Are you sure you want to remove the selected document?")) {
             return;
         }
-        $scope.postAndRefreshDocs("clear", {
+        $scope.postAndRefreshDocs("remove", {
             collection : $scope.collection,
-            document : angular.toJson($scope.paginatedDocuments[index])
+            document : angular.toJson($scope.documents[$scope.calcGlobalIndex(index)])
         }, "Document deleted successfully.");
     };
 
@@ -105,7 +110,7 @@ root.controller("mainController", function ($scope, apiName, $http) {
     };
 
     $scope.exportDoc = function (index) {
-        $scope.exportObject($scope.paginatedDocuments[index], $scope.collection + "_doc");
+        $scope.exportObject($scope.documents[$scope.calcGlobalIndex(index)], $scope.collection + "_doc");
     };
 
     $scope.applyFilter = function () {
@@ -115,10 +120,8 @@ root.controller("mainController", function ($scope, apiName, $http) {
         }).then(function (res) {
             if (res.data === void 0 || res.data === null || res.data.length === 0) {
                 $scope.documents = null;
-                $scope.paginatedDocuments = [];
             } else {
                 $scope.documents = res.data;
-                $scope.repaginate();
             }
         }, function () {
             alert("An error occured.");

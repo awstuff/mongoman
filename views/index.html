@@ -2,108 +2,132 @@
 
 <html lang="en" ng-app="root" ng-controller="mainController">
 <head>
-	<meta charset="utf-8">
-	<meta name="author" content="Adrian Wirth">
-	<title>{{dbName}} - Mongo Manager</title>
-	<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
-	<link rel="stylesheet" type="text/css" href="css/custom.css">
-	<script type="text/javascript" src="js/angular.min.js"></script>
-	<script type="text/javascript" src="js/ui-bootstrap-tpls-0.13.3.min.js"></script>
-	<script type="text/javascript" src="js/controller.js"></script>
-	<script type="text/javascript" src="js/FileSaver.min.js"></script>
-	<script type="text/javascript" src="js/Blob.js"></script>
+    <meta charset="utf-8">
+    <meta name="author" content="Adrian Wirth">
+    <title>{{dbName}} - Mongo Manager</title>
+    <link rel="stylesheet" type="text/css" href="css/angular-material.min.css">
+    <link rel="stylesheet" type="text/css" href="css/custom.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=RobotoDraft:300,400,500,700,400italic">
+    <script type="text/javascript" src="js/angular.min.js"></script>
+    <script type="text/javascript" src="js/angular-animate.min.js"></script>
+    <script type="text/javascript" src="js/angular-aria.min.js"></script>
+    <script type="text/javascript" src="js/angular-material.min.js"></script>
+    <script type="text/javascript" src="js/dirPagination.js"></script>
+    <script type="text/javascript" src="js/controller.js"></script>
+    <script type="text/javascript" src="js/FileSaver.min.js"></script>
+    <script type="text/javascript" src="js/Blob.js"></script>
+    <meta name="viewport" content="initial-scale=1" />
 </head>
-<body>
-	<a name="top"></a>
-	<div class="container">
-		<div class="row">
-			<div class="col-md-9 col-md-offset-3 top-shiz">
-				<h1 class="text-primary">
-					Mongo Manager
-					<small>{{dbName}}</small>
-				</h1>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-md-3">
-				<div class="panel panel-default">
-					<div class="panel-heading">Collections</div>
-					<div class="panel-body side">
-						<div class="text-muted" ng-show="collections == null">
-							No collections found.
-						</div>
-						<ul ng-show="collections != null">
-							<li ng-repeat="coll in collections" ng-click="setCollection(coll)">{{coll}}</li>
-						</ul>
-					</div>
-				</div>
-			</div>
-			<div class="col-md-9">
-				<div class="row">
-					<div class="col-md-12">
-						<div class="text-muted" ng-show="collection == null">
-							Please select a collection first.
-						</div>
-						<div ng-show="collection != null">
-							<h4 class="text-center">
-								<em>{{collection}}</em>
-							</h4>
-							<hr>
-							<div class="form-group">
-								<textarea class="form-control" placeholder="New document (JSON)" ng-modeL="newDoc"></textarea>
-							</div>
-							<div class="form-group">
-								<button type="button" class="btn btn-success" ng-disabled="newDoc == ''" ng-click="addDoc()">Add new document</button>
-								<button type="button" class="btn btn-danger" ng-disabled="documents == null" ng-click="removeAll()">Delete all documents</button>
-								<button type="button" class="btn btn-info pull-right" ng-disabled="documents == null" ng-click="export()">Export collection</button>
-							</div>
-							<div class="form-group">
-								<textarea class="form-control" ng-model="filter" placeholder="Filter (JSON)"></textarea>
-							</div>
-							<div class="form-group">
-								<button type="button" class="btn btn-default" ng-disabled="filter == ''" ng-click="applyFilter()">Apply filter</button>
-								<button type="button" class="btn btn-default" ng-click="resetFilter()">Reset</button>
-							</div>
-							<hr>
-							<div class="text-muted" ng-show="documents == null">
-								No documents found.
-							</div>
-							<div class="collections" ng-show="documents != null">
-								<div class="form-group">
-									Documents per page:
-									<select class="form-control auto-width" ng-model="pagination.itemsPerPage" ng-options="op for op in pagination.options track by op"></select>
-									({{documents.length}} total)
-								</div>
-								<div class="pagination-container">
-									<pagination ng-model="pagination.currentPage" total-items="documents.length" items-per-page="pagination.itemsPerPage" max-size="7" boundary-links="true"></pagination>
-								</div>
-								<hr>
-								<div class="panel panel-default" ng-repeat="doc in paginatedDocuments">
-									<div class="panel-heading">
-										<button type="button" class="btn btn-danger btn-xs pull-right" ng-click="remove($index)">Delete document</button>
-										<button type="button" class="btn btn-info btn-xs pull-right px-to-right" ng-click="exportDoc($index)">Export document</button>
-									</div>
-									<div class="panel-body">
-										<table>
-											<tr ng-repeat="(key, value) in doc">
-												<td class="key text-muted">{{key}}: </td>
-												<td class="value">{{value}}</td>
-											</tr>
-										</table>
-									</div>
-								</div>
-								<div class="text-center px-to-bottom">
-									<a href="#top">
-										<button type="button" class="btn btn-default">Back to the top</button>
-									</a>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
+<body layout="column">
+    <md-toolbar layout="row">
+        <div class="md-toolbar-tools">
+            <md-button ng-click="toggleSidenav('left')" hide-gt-sm class="md-icon-button">
+                <md-icon aria-label="Menu" md-svg-icon="https://s3-us-west-2.amazonaws.com/s.cdpn.io/68133/menu.svg"></md-icon>
+            </md-button>
+            <h1>
+                Mongo Manager
+                <small>{{dbName}}</small>
+            </h1>
+        </div>
+    </md-toolbar>
+    <div layout="row" flex>
+        <md-sidenav layout="column" class="md-sidenav-left md-whiteframe-z2" md-component-id="left" md-is-locked-open="$mdMedia('gt-sm')">
+            <md-list>
+                <md-subheader class="md-no-sticky accent-color">Collections</md-subheader>
+                <md-list-item ng-show="collections == null">
+                    <div class="md-list-item-text" layout="column">
+                        <p>No collections found.</p>
+                    </div>
+                </md-list-item>
+                <md-list-item ng-repeat="coll in collections" ng-show="collections != null" ng-click="setCollection(coll)">
+                    <div class="coll-icon">{}</div>
+                    <div class="md-list-item-text" layout="column">
+                        <p>{{coll}}</p>
+                    </div>
+                </md-list-item>
+            </md-list>
+        </md-sidenav>
+        <div layout="column" flex id="content">
+            <md-content layout="column" flex class="md-padding">
+                <a name="top"></a>
+                <div class="text-muted headline-margin" ng-show="collection == null">
+                    Please select a collection first.
+                </div>
+                <div ng-show="collection != null">
+                    <md-card>
+                        <md-card-content>
+                            <h2 class="md-title accent-color">Collection: {{collection}}</h2>
+                        </md-card-content>
+                    </md-card>
+                    <md-card>
+                        <md-card-content>
+                            <md-input-container>
+                                <label>New document (JSON)</label>
+                                <textarea ng-model="newDoc"></textarea>
+                            </md-input-container>
+                            <section layout="row" layout-sm="column" layout-align="start center" layout-wrap>
+                                <md-button class="md-primary md-raised" ng-disabled="newDoc == ''" ng-click="addDoc()">Add new document</md-button>
+                                <md-button class="md-warn md-raised" ng-disabled="documents == null" ng-click="removeAll()">Delete all documents</md-button>
+                                <md-button class="md-raised" ng-disabled="documents == null" ng-click="export()">Export collection</md-button>
+                            </section>
+                            <md-input-container>
+                                <label>Filter (JSON)</label>
+                                <textarea ng-model="filter"></textarea>
+                            </md-input-container>
+                            <section class="pos-relative" layout="row" layout-sm="column" layout-align="start center" layout-wrap>
+                                <md-button class="md-raised" ng-disabled="filter == ''" ng-click="applyFilter()">Apply filter</md-button>
+                                <md-button class="md-raised" ng-click="resetFilter()">Reset</md-button>
+                            </section>
+                        </md-card-content>
+                    </md-card>
+                    <md-card>
+                        <md-card-content>
+                            <div class="text-muted" ng-show="documents == null">
+                                No documents found.
+                            </div>
+                            <div class="collections" ng-show="documents != null">
+                                <div layout="row">
+                                    <div class="inline-label">
+                                        Documents per page:
+                                    </div>
+                                    <md-input-container>
+                                        <label class="md-placeholder">Documents per page</label>
+                                        <md-select ng-model="pagination.itemsPerPage" role="combobox">
+                                            <md-option ng-repeat="op in pagination.options" value="{{op}}">
+                                                {{op}}
+                                            </md-option>
+                                        </md-select>
+                                    </md-input-container>
+                                    <div class="inline-label">
+                                        ({{documents.length}} total)
+                                    </div>
+                                </div>
+                                <div class="pagination-container">
+                                    <dir-pagination-controls boundary-links="true" template-url="js/dirPagination.tpl.html"></dir-pagination-controls>
+                                </div>
+                            </div>
+                        </md-card-content>
+                    </md-card>
+                    <md-card dir-paginate="document in documents | itemsPerPage: pagination.itemsPerPage" current-page="pagination.currentPage">
+                        <md-card-content>
+                            <section layout="row" layout-sm="column" layout-align="end center" layout-wrap>
+                                <md-button ng-click="exportDoc($index)">Export document</md-button>
+                                <md-button class="md-warn" ng-click="remove($index)">Delete document</md-button>
+                            </section>
+                            <table>
+                                <tr ng-repeat="(key, value) in document">
+                                    <td class="key text-muted">{{key}}: </td>
+                                    <td>{{value}}</td>
+                                </tr>
+                            </table>
+                        </md-card-content>
+                    </md-card>
+                    <section class="back-to-top" layout="row" layout-sm="column" layout-align="center center" layout-wrap>
+                        <md-button ng-href="#top">Back to the top</md-button>
+                    </section>
+                </div>
+            </md-content>
+        </div>
+    </div>
 </body>
-
 </html>
