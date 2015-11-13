@@ -13,7 +13,7 @@ root.config(function ($mdThemingProvider) {
 root.controller("mainController", function ($scope, $mdSidenav, apiName, $http) {
     $scope.api = "/" + apiName + "/";
     $scope.dbName = "";
-    $scope.collections = null;
+    $scope.collections = [];
     $scope.collection = null;
     $scope.documents = null;
     $scope.newDoc = "";

@@ -34,12 +34,12 @@
         <md-sidenav layout="column" class="md-sidenav-left md-whiteframe-z2" md-component-id="left" md-is-locked-open="$mdMedia('gt-sm')">
             <md-list>
                 <md-subheader class="md-no-sticky accent-color">Collections</md-subheader>
-                <md-list-item ng-show="collections == null">
+                <md-list-item ng-show="collections.length == 0">
                     <div class="md-list-item-text" layout="column">
                         <p>No collections found.</p>
                     </div>
                 </md-list-item>
-                <md-list-item ng-repeat="coll in collections" ng-show="collections != null" ng-click="setCollection(coll)">
+                <md-list-item ng-repeat="coll in collections" ng-show="collections.length > 0" ng-click="setCollection(coll)">
                     <div class="coll-icon">{}</div>
                     <div class="md-list-item-text" layout="column">
                         <p>{{coll}}</p>
