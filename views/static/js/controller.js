@@ -113,6 +113,10 @@ root.controller("mainController", function ($scope, $mdSidenav, apiName, $http) 
         $scope.exportObject($scope.documents[$scope.calcGlobalIndex(index)], $scope.collection + "_doc");
     };
 
+    $scope.copyDocToClipBoard = function (index) {
+        prompt("Copy to clipboard: Ctrl+C, Enter", angular.toJson($scope.documents[$scope.calcGlobalIndex(index)]));
+    };
+
     $scope.applyFilter = function () {
         $http.post($scope.api + "filter", {
             collection : $scope.collection,
