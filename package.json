@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "a gui providing restricted access to a mongodb database",
   "main": "server.js",
-  "author": "Adrian Wirth <adrian.wirth@yahoo.de>",
+  "author": "Adrian Wirth <dev@adrianwirth.com>",
   "license": "MIT",
   "dependencies": {
     "basic-auth": "^1.0.3",
